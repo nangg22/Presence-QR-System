@@ -24,6 +24,23 @@ Base.metadata.create_all(bind=engine)
 # 3. Inisialisasi FastAPI
 app = FastAPI()
 
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], # Izinkan semua alamat akses
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Tambahkan route buat ambil semua data absen
+@app.get("/attendance-list")
+def get_attendance():
+    db = SessionLocal()
+    data = db.query(Attendance).all()
+    db.close()
+    return data
+
 @app.get("/")
 def home():
     return {"message": "Backend Presence QR System Ready! 🚀"}
