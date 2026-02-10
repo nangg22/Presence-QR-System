@@ -59,6 +59,16 @@ def delete_attendance(item_id: int):
 def home():
     return {"message": "Backend Presence QR System Ready! 🚀"}
 
+# Tambah logika pengecekan data absen baru
+# Password admin (Ganti sesuai keinginanmu)
+ADMIN_PASSWORD = "uisi_presensi"
+
+@app.post("/login")
+def login(password: str):
+    if password == ADMIN_PASSWORD:
+        return {"status": "success", "message": "Login Berhasil"}
+    return {"status": "error", "message": "Password Salah"}
+
 @app.post("/attend")
 def post_attendance(nama: str, nim: str):
     db = SessionLocal()
