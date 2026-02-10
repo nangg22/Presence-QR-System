@@ -5,35 +5,70 @@ import axios from "axios";
 export default function AdminPage() {
   const [list, setList] = useState([]);
 
+  const fetchData = async () => {
+    try {
+      const res = await axios.get("http://127.0.0.1:8000/attendance-list");
+      setList(res.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const deleteItem = async (id: number) => {
+    if (confirm("Yakin mau hapus data ini?")) {
+      await axios.delete(`http://127.0.0.1:8000/attendance/${id}`);
+      fetchData(); // Refresh data setelah hapus
+    }
+  };
+
   useEffect(() => {
-    // Ambil data dari backend tiap kali halaman dibuka
-    axios.get("http://127.0.0.1:8000/attendance-list")
-      .then(res => setList(res.data))
-      .catch(err => console.error(err));
+    fetchData();
   }, []);
 
   return (
-    <div className="p-8">
-      <h1 className="text-3xl font-bold mb-6">Rekap Presensi QR</h1>
-      <div className="overflow-x-auto bg-white shadow-md rounded-lg">
-        <table className="min-w-full table-auto">
-          <thead className="bg-gray-200">
-            <tr>
-              <th className="px-4 py-2">Nama</th>
-              <th className="px-4 py-2">NIM</th>
-              <th className="px-4 py-2">Waktu Hadir</th>
-            </tr>
-          </thead>
-          <tbody>
-            {list.map((item: any) => (
-              <tr key={item.id} className="border-b text-center">
-                <td className="px-4 py-2">{item.nama}</td>
-                <td className="px-4 py-2">{item.nim}</td>
-                <td className="px-4 py-2">{new Date(item.waktu_hadir).toLocaleString()}</td>
+    <div className="min-h-screen bg-gray-100 p-8">
+      <div className="max-w-4xl mx-auto">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-800">📋 Rekap Presensi QR</h1>
+          <button 
+            onClick={() => window.location.href = '/scan'}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+          >
+            Buka Scanner
+          </button>
+        </div>
+
+        <div className="bg-white shadow-xl rounded-2xl overflow-hidden">
+          <table className="min-w-full">
+            <thead className="bg-gray-800 text-white">
+              <tr>
+                <th className="px-6 py-4 text-left">Nama</th>
+                <th className="px-6 py-4 text-left">NIM</th>
+                <th className="px-6 py-4 text-left">Waktu</th>
+                <th className="px-6 py-4 text-center">Aksi</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {list.map((item: any) => (
+                <tr key={item.id} className="hover:bg-gray-50 transition">
+                  <td className="px-6 py-4 font-medium">{item.nama}</td>
+                  <td className="px-6 py-4 text-gray-600">{item.nim}</td>
+                  <td className="px-6 py-4 text-gray-500 text-sm">
+                    {new Date(item.waktu_hadir).toLocaleString('id-ID')}
+                  </td>
+                  <td className="px-6 py-4 text-center">
+                    <button 
+                      onClick={() => deleteItem(item.id)}
+                      className="text-red-500 hover:text-red-700 font-bold"
+                    >
+                      Hapus
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

@@ -41,6 +41,20 @@ def get_attendance():
     db.close()
     return data
 
+
+# Tambahkan route untuk hapus data berdasarkan ID
+@app.delete("/attendance/{item_id}")
+def delete_attendance(item_id: int):
+    db = SessionLocal()
+    item = db.query(Attendance).filter(Attendance.id == item_id).first()
+    if item:
+        db.delete(item)
+        db.commit()
+        db.close()
+        return {"status": "Data dihapus!"}
+    db.close()
+    return {"status": "Data tidak ditemukan"}
+
 @app.get("/")
 def home():
     return {"message": "Backend Presence QR System Ready! 🚀"}
